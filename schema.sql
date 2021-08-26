@@ -1,4 +1,4 @@
-CREATE SCHEMA web3storage;
+CREATE SCHEMA web3storage
   CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
     name character varying NOT NULL,
