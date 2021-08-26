@@ -1,72 +1,72 @@
 CREATE SCHEMA web3storage
   CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
-    name character varying NOT NULL,
-    picture character varying,
-    email character varying NOT NULL,
-    issuer character varying UNIQUE NOT NULL,
-    github character varying,
-    publicAddress character varying NOT NULL,
-    usedStorage bigint DEFAULT 0,
-    created timestamp(6) without time zone NOT NULL
+    name TEXT NOT NULL,
+    picture TEXT,
+    email TEXT NOT NULL,
+    issuer TEXT UNIQUE NOT NULL,
+    github TEXT,
+    public_address TEXT NOT NULL,
+    used_storage bigint DEFAULT 0,
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
   )
   CREATE TABLE auth_tokens (
     id BIGSERIAL PRIMARY KEY,
-    name character varying NOT NULL,
-    secret character varying NOT NULL,
-    userId bigint NOT NULL,
-    created timestamp(6) without time zone NOT NULL,
-    deleted timestamp(6) without time zone
+    name TEXT NOT NULL,
+    secret TEXT NOT NULL,
+    user_id bigint NOT NULL,
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
   CREATE TABLE uploads (
     id BIGSERIAL PRIMARY KEY,
-    userId bigint NOT NULL,
-    authTokenId bigint NOT NULL,
-    contentId bigint NOT NULL,
-    name character varying,
-    created timestamp(6) without time zone NOT NULL,
-    deleted timestamp(6) without time zone
+    user_id bigint NOT NULL,
+    auth_token_id bigint NOT NULL,
+    content_id bigint NOT NULL,
+    name TEXT,
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
   CREATE TABLE contents (
     id BIGSERIAL PRIMARY KEY,
-    cid character varying UNIQUE NOT NULL,
-    dagSize bigint DEFAULT 0,
-    created timestamp(6) without time zone NOT NULL
+    cid TEXT UNIQUE NOT NULL,
+    dag_size bigint DEFAULT 0,
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
   )
   CREATE TABLE pins (
     id BIGSERIAL PRIMARY KEY,
-    contentId bigint NOT NULL,
-    pinLocationId bigint NOT NULL,
-    status character varying NOT NULL,
-    created timestamp(6) without time zone NOT NULL,
+    content_id bigint NOT NULL,
+    pin_location_id bigint NOT NULL,
+    status TEXT NOT NULL,
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated timestamp(6) without time zone NOT NULL
   )
   CREATE TABLE pin_locations (
     id BIGSERIAL PRIMARY KEY,
-    peerId character varying UNIQUE NOT NULL,
-    peerName character varying,
-    region character varying
+    peer_id TEXT UNIQUE NOT NULL,
+    peer_name TEXT,
+    region TEXT
   )
   CREATE TABLE aggregate_entries (
     id BIGSERIAL PRIMARY KEY,
-    contentId bigint NOT NULL,
-    aggregateId bigint NOT NULL,
-    dataModelSelector character varying
+    content_id bigint NOT NULL,
+    aggregate_id bigint NOT NULL,
+    data_model_selector TEXT
   )
   CREATE TABLE aggregates (
     id BIGSERIAL PRIMARY KEY,
-    dataCid character varying NOT NULL,
-    pieceCid character varying
+    data_cid TEXT NOT NULL,
+    piece_cid TEXT
   )
   CREATE TABLE deals (
     id BIGSERIAL PRIMARY KEY,
-    aggregateId bigint NOT NULL,
-    storageProvider character varying,
-    dealId bigint UNIQUE NOT NULL, -- (self referencing column name)
+    aggregate_id bigint NOT NULL,
+    storage_provider TEXT,
+    deal_id bigint UNIQUE NOT NULL,
     activation timestamp(6) without time zone,
     renewel timestamp(6) without time zone,
-    status character varying NOT NULL,
-    statusReason character varying,
-    created timestamp(6) without time zone NOT NULL,
+    status TEXT NOT NULL,
+    status_reason TEXT,
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated timestamp(6) without time zone NOT NULL
   );
