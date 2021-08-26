@@ -62,8 +62,8 @@ CREATE SCHEMA web3storage
     aggregateId bigint NOT NULL,
     storageProvider character varying,
     dealId bigint UNIQUE NOT NULL, -- (self referencing column name)
-    activation timestamp(6) without time zone
-    renewel timestamp(6) without time zone
+    activation timestamp(6) without time zone,
+    renewel timestamp(6) without time zone,
     status character varying NOT NULL,
     statusReason character varying,
     created timestamp(6) without time zone NOT NULL,
