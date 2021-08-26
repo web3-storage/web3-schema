@@ -55,8 +55,12 @@ CREATE SCHEMA web3storage
   )
   CREATE TABLE aggregates (
     id BIGSERIAL PRIMARY KEY,
-    data_cid TEXT NOT NULL,
-    piece_cid TEXT
+    aggregate_cid text UNIQUE NOT NULL, -- previously dataCid
+    piece_cid TEXT UNIQUE,
+    sha256hex TEXT,
+    export_size BIGINT,
+    metadata jsonb NOT NULL,
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
   )
   CREATE TABLE deals (
     id BIGSERIAL PRIMARY KEY,
