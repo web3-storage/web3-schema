@@ -55,5 +55,6 @@
       "description": "A schema-qualified stored procedure name to call right after switching roles for a client request",
       "required": false
     }
-  }
+  },
+  "addons": ["heroku-postgresql:standard-0"]
 }
