@@ -39,7 +39,7 @@ CREATE SCHEMA web3storage
     pin_location_id bigint NOT NULL,
     status TEXT NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated timestamp(6) without time zone NOT NULL
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
   CREATE TABLE pin_locations (
     id BIGSERIAL PRIMARY KEY,
