@@ -22,6 +22,7 @@ CREATE SCHEMA web3storage
     id BIGSERIAL PRIMARY KEY,
     userId bigint NOT NULL,
     authTokenId bigint NOT NULL,
+    contentId bigint NOT NULL,
     name character varying,
     created timestamp(6) without time zone NOT NULL,
     deleted timestamp(6) without time zone
