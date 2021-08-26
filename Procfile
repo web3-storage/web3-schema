@@ -1,1 +1,1 @@
-./env-to-config ./postgrest postgrest.conf
+./env-to-config ./postgrest
