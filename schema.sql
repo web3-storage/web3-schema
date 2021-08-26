@@ -13,7 +13,7 @@ CREATE SCHEMA web3storage
   CREATE TABLE auth_tokens (
     id BIGSERIAL PRIMARY KEY,
     name character varying NOT NULL,
-    secret character varying NOT NULL, -- TODO unique index?
+    secret character varying NOT NULL,
     userId bigint NOT NULL,
     created timestamp(6) without time zone NOT NULL,
     deleted timestamp(6) without time zone
