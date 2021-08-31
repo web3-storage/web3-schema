@@ -8,7 +8,8 @@ CREATE SCHEMA web3storage
     github TEXT,
     public_address TEXT NOT NULL,
     used_storage bigint DEFAULT 0,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at timestamp with time zone
   )
   CREATE TABLE auth_tokens (
     id BIGSERIAL PRIMARY KEY,
@@ -16,22 +17,23 @@ CREATE SCHEMA web3storage
     secret TEXT NOT NULL,
     user_id bigint NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+    deleted_at timestamp with time zone
   )
   CREATE TABLE uploads (
     id BIGSERIAL PRIMARY KEY,
     user_id bigint NOT NULL,
-    auth_token_id bigint NOT NULL,
+    auth_token_id bigint,
     content_id bigint NOT NULL,
     name TEXT,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+    deleted_at timestamp with time zone
   )
   CREATE TABLE contents (
     id BIGSERIAL PRIMARY KEY,
     cid TEXT UNIQUE NOT NULL,
     dag_size bigint DEFAULT 0,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at timestamp with time zone
   )
   CREATE TABLE pins (
     id BIGSERIAL PRIMARY KEY,
@@ -39,7 +41,7 @@ CREATE SCHEMA web3storage
     pin_location_id bigint NOT NULL,
     status TEXT NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated timestamp(6) without time zone NOT NULL
+    updated_at timestamp with time zone
   )
   CREATE TABLE pin_locations (
     id BIGSERIAL PRIMARY KEY,
@@ -63,10 +65,10 @@ CREATE SCHEMA web3storage
     aggregate_id bigint NOT NULL,
     storage_provider TEXT,
     deal_id bigint UNIQUE NOT NULL,
-    activation timestamp(6) without time zone,
-    renewel timestamp(6) without time zone,
+    activation timestamp with time zone,
+    renewal timestamp with time zone,
     status TEXT NOT NULL,
     status_reason TEXT,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated timestamp(6) without time zone NOT NULL
+    updated_at timestamp with time zone
   );
