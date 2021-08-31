@@ -19,12 +19,18 @@ CREATE SCHEMA web3storage
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     deleted_at timestamp with time zone
   )
+  CREATE TYPE upload_type AS ENUM (
+    'Car',
+    'Blob',
+    'Multipart'
+  )
   CREATE TABLE uploads (
     id BIGSERIAL PRIMARY KEY,
     user_id bigint NOT NULL,
     auth_token_id bigint,
     content_id bigint NOT NULL,
     name TEXT,
+    type upload_type NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
@@ -35,11 +41,25 @@ CREATE SCHEMA web3storage
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at timestamp with time zone  DEFAULT timezone('utc'::text, now())
   )
+  CREATE TYPE pin_status AS ENUM (
+    'Undefined',
+    'ClusterError',
+    'PinError',
+    'UnpinError',
+    'Pinned',
+    'Pinning',
+    'Unpinning',
+    'Unpinned',
+    'Remote',
+    'PinQueued',
+    'UnpinQueued',
+    'Sharded'
+  )
   CREATE TABLE pins (
     id BIGSERIAL PRIMARY KEY,
     content_id bigint NOT NULL,
     pin_location_id bigint NOT NULL,
-    status TEXT NOT NULL,
+    status pin_status NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
@@ -64,6 +84,12 @@ CREATE SCHEMA web3storage
     metadata jsonb NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
   )
+  CREATE TYPE deal_status AS ENUM (
+    'Queued',
+    'Published',
+    'Active',
+    'Terminated'
+  )
   CREATE TABLE deals (
     id BIGSERIAL PRIMARY KEY,
     aggregate_id bigint NOT NULL,
@@ -71,7 +97,7 @@ CREATE SCHEMA web3storage
     deal_id bigint UNIQUE NOT NULL,
     activation timestamp with time zone,
     renewal timestamp with time zone,
-    status TEXT NOT NULL,
+    status deal_status NOT NULL,
     status_reason TEXT,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
