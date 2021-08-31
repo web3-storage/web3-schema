@@ -26,14 +26,14 @@ CREATE SCHEMA web3storage
     content_id bigint NOT NULL,
     name TEXT,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
   CREATE TABLE contents (
     id BIGSERIAL PRIMARY KEY,
     cid TEXT UNIQUE NOT NULL,
     dag_size bigint DEFAULT 0,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at timestamp with time zone
+    updated_at timestamp with time zone  DEFAULT timezone('utc'::text, now())
   )
   CREATE TABLE pins (
     id BIGSERIAL PRIMARY KEY,
@@ -74,5 +74,5 @@ CREATE SCHEMA web3storage
     status TEXT NOT NULL,
     status_reason TEXT,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at timestamp with time zone
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   );
