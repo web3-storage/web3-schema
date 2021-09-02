@@ -1,5 +1,5 @@
 CREATE SCHEMA web3storage
-  CREATE TABLE users (
+  CREATE TABLE user (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     picture TEXT,
@@ -11,7 +11,7 @@ CREATE SCHEMA web3storage
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at timestamp with time zone
   )
-  CREATE TABLE auth_tokens (
+  CREATE TABLE auth_key (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     secret TEXT NOT NULL,
@@ -24,17 +24,17 @@ CREATE SCHEMA web3storage
     'Blob',
     'Multipart'
   )
-  CREATE TABLE uploads (
+  CREATE TABLE upload (
     id BIGSERIAL PRIMARY KEY,
     user_id bigint NOT NULL,
-    auth_token_id bigint,
+    auth_key_id bigint,
     content_id bigint NOT NULL,
     name TEXT,
     type upload_type NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
-  CREATE TABLE contents (
+  CREATE TABLE content (
     id BIGSERIAL PRIMARY KEY,
     cid TEXT UNIQUE NOT NULL,
     dag_size bigint DEFAULT 0,
@@ -55,7 +55,7 @@ CREATE SCHEMA web3storage
     'UnpinQueued',
     'Sharded'
   )
-  CREATE TABLE pins (
+  CREATE TABLE pin (
     id BIGSERIAL PRIMARY KEY,
     content_id bigint NOT NULL,
     pin_location_id bigint NOT NULL,
@@ -63,21 +63,21 @@ CREATE SCHEMA web3storage
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
-  CREATE TABLE pin_locations (
+  CREATE TABLE pin_location (
     id BIGSERIAL PRIMARY KEY,
     peer_id TEXT UNIQUE NOT NULL,
     peer_name TEXT,
     region TEXT
   )
-  CREATE TABLE aggregate_entries (
+  CREATE TABLE aggregate_entry (
     id BIGSERIAL PRIMARY KEY,
     content_id bigint NOT NULL,
     aggregate_id bigint NOT NULL,
     data_model_selector TEXT
   )
-  CREATE TABLE aggregates (
+  CREATE TABLE aggregate (
     id BIGSERIAL PRIMARY KEY,
-    aggregate_cid text UNIQUE NOT NULL, -- previously dataCid
+    data_cid TEXT UNIQUE NOT NULL,
     piece_cid TEXT UNIQUE,
     sha256hex TEXT,
     export_size BIGINT,
@@ -90,7 +90,7 @@ CREATE SCHEMA web3storage
     'Active',
     'Terminated'
   )
-  CREATE TABLE deals (
+  CREATE TABLE deal (
     id BIGSERIAL PRIMARY KEY,
     aggregate_id bigint NOT NULL,
     storage_provider TEXT,
