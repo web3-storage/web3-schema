@@ -1,4 +1,4 @@
-CREATE SCHEMA web3storage;
+CREATE SCHEMA web3storage
   CREATE TABLE user (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
