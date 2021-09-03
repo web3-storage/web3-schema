@@ -28,15 +28,17 @@ CREATE SCHEMA web3storage
     id BIGSERIAL PRIMARY KEY,
     user_id bigint NOT NULL,
     auth_key_id bigint,
-    content_id bigint NOT NULL,
+    content_cid TEXT NOT NULL,
+    -- CID for content as provided by the user
+    cid TEXT NOT NULL,
     name TEXT,
     type upload_type NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
   )
   CREATE TABLE content (
-    id BIGSERIAL PRIMARY KEY,
-    cid TEXT UNIQUE NOT NULL,
+    -- normalized base32 v1
+    cid TEXT PRIMARY KEY,
     dag_size bigint DEFAULT 0,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at timestamp with time zone  DEFAULT timezone('utc'::text, now())
