@@ -59,7 +59,7 @@ CREATE SCHEMA web3storage
   )
   CREATE TABLE pin (
     id BIGSERIAL PRIMARY KEY,
-    content_id bigint NOT NULL,
+    content_cid TEXT NOT NULL,
     pin_location_id bigint NOT NULL,
     status pin_status NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -73,7 +73,7 @@ CREATE SCHEMA web3storage
   )
   CREATE TABLE aggregate_entry (
     id BIGSERIAL PRIMARY KEY,
-    content_id bigint NOT NULL,
+    content_cid TEXT NOT NULL,
     aggregate_id bigint NOT NULL,
     data_model_selector TEXT
   )
