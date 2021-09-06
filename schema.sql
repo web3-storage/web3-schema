@@ -30,7 +30,7 @@ CREATE SCHEMA web3storage
     auth_key_id bigint,
     content_cid TEXT NOT NULL,
     -- CID for content as provided by the user
-    cid TEXT NOT NULL,
+    source_cid TEXT NOT NULL,
     name TEXT,
     type upload_type NOT NULL,
     inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
