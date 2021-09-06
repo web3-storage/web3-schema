@@ -1,106 +1,125 @@
-CREATE SCHEMA web3storage
-  CREATE TABLE user (
-    id BIGSERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    picture TEXT,
-    email TEXT NOT NULL,
-    issuer TEXT UNIQUE NOT NULL,
-    github TEXT,
-    public_address TEXT NOT NULL,
-    used_storage bigint DEFAULT 0,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at timestamp with time zone
-  )
-  CREATE TABLE auth_key (
-    id BIGSERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    secret TEXT NOT NULL,
-    user_id bigint NOT NULL,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    deleted_at timestamp with time zone
-  )
-  CREATE TYPE upload_type AS ENUM (
-    'Car',
-    'Blob',
-    'Multipart'
-  )
-  CREATE TABLE upload (
-    id BIGSERIAL PRIMARY KEY,
-    user_id bigint NOT NULL,
-    auth_key_id bigint,
-    content_cid TEXT NOT NULL,
-    -- CID for content as provided by the user
-    source_cid TEXT NOT NULL,
-    name TEXT,
-    type upload_type NOT NULL,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, now())
-  )
-  CREATE TABLE content (
-    -- normalized base32 v1
-    cid TEXT PRIMARY KEY,
-    dag_size bigint DEFAULT 0,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at timestamp with time zone  DEFAULT timezone('utc'::text, now())
-  )
-  CREATE TYPE pin_status AS ENUM (
-    'Undefined',
-    'ClusterError',
-    'PinError',
-    'UnpinError',
-    'Pinned',
-    'Pinning',
-    'Unpinning',
-    'Unpinned',
-    'Remote',
-    'PinQueued',
-    'UnpinQueued',
-    'Sharded'
-  )
-  CREATE TABLE pin (
-    id BIGSERIAL PRIMARY KEY,
-    content_cid TEXT NOT NULL,
-    pin_location_id bigint NOT NULL,
-    status pin_status NOT NULL,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
-  )
-  CREATE TABLE pin_location (
-    id BIGSERIAL PRIMARY KEY,
-    peer_id TEXT UNIQUE NOT NULL,
-    peer_name TEXT,
-    region TEXT
-  )
-  CREATE TABLE aggregate_entry (
-    id BIGSERIAL PRIMARY KEY,
-    content_cid TEXT NOT NULL,
-    aggregate_id bigint NOT NULL,
-    data_model_selector TEXT
-  )
-  CREATE TABLE aggregate (
-    id BIGSERIAL PRIMARY KEY,
-    data_cid TEXT UNIQUE NOT NULL,
-    piece_cid TEXT UNIQUE,
-    sha256hex TEXT,
-    export_size BIGINT,
-    metadata jsonb NOT NULL,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
-  )
-  CREATE TYPE deal_status AS ENUM (
-    'Queued',
-    'Published',
-    'Active',
-    'Terminated'
-  )
-  CREATE TABLE deal (
-    id BIGSERIAL PRIMARY KEY,
-    aggregate_id bigint NOT NULL,
-    storage_provider TEXT,
-    deal_id bigint UNIQUE NOT NULL,
-    activation timestamp with time zone,
-    renewal timestamp with time zone,
-    status deal_status NOT NULL,
-    status_reason TEXT,
-    inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
-  );
+CREATE SCHEMA web3storage;
+
+-- A user of web3.storage.
+CREATE TABLE web3storage.user (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  picture TEXT,
+  email TEXT NOT NULL,
+  -- The Decentralized ID of the Magic User who generated the DID Token.
+  issuer TEXT UNIQUE NOT NULL,
+  -- GitHub user handle, may be null if user logged in via email.
+  github TEXT,
+  -- Cryptographic public address of the Magic User.
+  public_address TEXT NOT NULL,
+  -- Used storage in bytes.
+  used_storage BIGINT DEFAULT 0,
+  inserted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- User authentication keys.
+CREATE TABLE web3storage.auth_key (
+  id BIGSERIAL PRIMARY KEY,
+  -- User assigned name.
+  name TEXT NOT NULL,
+  -- Secret that corresponds to this token.
+  secret TEXT NOT NULL,
+  -- User this token belongs to.
+  user_id BIGINT NOT NULL,
+  inserted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  deleted_at TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TYPE web3storage.upload_type AS ENUM (
+  -- A CAR file upload.
+  'Car',
+  -- A raw blob upload in the request body.
+  'Blob',
+  -- A multi file upload using a multipart request.
+  'Multipart'
+);
+
+-- An upload created by a user.
+CREATE TABLE web3storage.upload (
+  id BIGSERIAL PRIMARY KEY,
+  -- User that uploaded this content.
+  user_id BIGINT NOT NULL,
+  -- User authentication token that was used to upload this content.
+  -- Note: nullable, because the user may have used a Magic.link token.
+  auth_key_id BIGINT,
+  -- The root of the uploaded content.
+  content_cid TEXT NOT NULL,
+  -- CID for the content as provided by the user.
+  source_cid TEXT NOT NULL,
+  -- User provided name for this upload.
+  name TEXT,
+  -- Type of received upload data.
+  type web3storage.upload_type NOT NULL,
+  inserted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  deleted_at TIMESTAMP WITH TIME ZONE
+);
+
+-- Details of the root of a file/directory stored on web3.storage.
+CREATE TABLE web3storage.content (
+  -- Root CID for this content. Normalized as v1 base32.
+  cid TEXT PRIMARY KEY,
+  -- Size of the DAG in bytes. Set if known on upload or for partials is set
+  -- when content is fully pinned in at least one location.
+  dag_size BIGINT,
+  inserted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- IPFS Cluster tracker status values.
+CREATE TYPE web3storage.pin_status AS ENUM (
+  -- Should never see this value. When used as a filter. It means "all".
+  'Undefined',
+  -- The cluster node is offline or not responding.
+  'ClusterError',
+  -- An error occurred pinning.
+  'PinError',
+  -- An error occurred unpinning.
+  'UnpinError',
+  -- The IPFS daemon has pinned the item.
+  'Pinned',
+  -- The IPFS daemon is currently pinning the item.
+  'Pinning',
+  -- The IPFS daemon is currently unpinning the item.
+  'Unpinning',
+  -- The IPFS daemon is not pinning the item.
+  'Unpinned',
+  -- The IPFS daemon is not pinning the item but it is being tracked.
+  'Remote',
+  -- The item has been queued for pinning on the IPFS daemon.
+  'PinQueued',
+  -- The item has been queued for unpinning on the IPFS daemon.
+  'UnpinQueued',
+  -- The IPFS daemon is not pinning the item through this CID but it is tracked
+  -- in a cluster dag
+  'Sharded'
+);
+
+-- Information for piece of content pinned in IPFS.
+CREATE TABLE web3storage.pin (
+  id BIGSERIAL PRIMARY KEY,
+  -- The content being pinned.
+  content_cid TEXT NOT NULL,
+  -- Identifier for the service that is pinning this pin.
+  pin_location_id BIGINT NOT NULL,
+  -- Pinning status at this location.
+  status web3storage.pin_status NOT NULL,
+  inserted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- An IPFS node that is pinning content.
+CREATE TABLE web3storage.pin_location (
+  id BIGSERIAL PRIMARY KEY,
+  -- Libp2p peer ID of the node pinning this pin.
+  peer_id TEXT UNIQUE NOT NULL,
+  -- Name of the peer pinning this pin.
+  peer_name TEXT,
+  -- Geographic region this node resides in.
+  region TEXT
+);
